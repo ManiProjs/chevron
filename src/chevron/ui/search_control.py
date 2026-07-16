@@ -12,8 +12,8 @@ from prompt_toolkit.layout import Layout
 from prompt_toolkit.layout.controls import UIControl, UIContent
 from prompt_toolkit.layout.containers import Window
 from prompt_toolkit.layout.dimension import Dimension
-from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
-from prompt_toolkit.formatted_text import to_formatted_text, StyleAndTextTuples
+from prompt_toolkit.mouse_events import MouseEvent
+from prompt_toolkit.formatted_text import StyleAndTextTuples
 from prompt_toolkit.styles import Style
 from prompt_toolkit.data_structures import Point
 
