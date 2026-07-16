@@ -42,12 +42,14 @@ class SearchControl:
             always_hide_cursor=False,
         )
 
-        style = Style.from_dict({
-            'pointer': self.theme.pointer_style,
-            'message': self.theme.message_style,
-            'selected': self.theme.pointer_style,
-            'query': '',
-        })
+        style = Style.from_dict(
+            {
+                "pointer": self.theme.pointer_style,
+                "message": self.theme.message_style,
+                "selected": self.theme.pointer_style,
+                "query": "",
+            }
+        )
 
         kb = control.get_key_bindings()
 
@@ -91,16 +93,20 @@ class _SearchControl(UIControl):
         lines: StyleAndTextTuples = []
 
         # First line: pointer + message
-        lines.append([
-            ('class:pointer', self.theme.pointer),
-            ('class:message', f' {self.message}'),
-        ])
+        lines.append(
+            [
+                ("class:pointer", self.theme.pointer),
+                ("class:message", f" {self.message}"),
+            ]
+        )
 
         # Second line: '> ' + query (editable)
-        lines.append([
-            ('class:message', '> '),
-            ('class:query', self.query),
-        ])
+        lines.append(
+            [
+                ("class:message", "> "),
+                ("class:query", self.query),
+            ]
+        )
 
         # Reserve 2 lines for the prompt and query, leaving 4 visible results.
         visible_height = 4
@@ -111,22 +117,26 @@ class _SearchControl(UIControl):
             self.scroll_offset = self.selected - visible_height + 1
 
         visible_matches = self.matches[
-            self.scroll_offset:self.scroll_offset + visible_height
+            self.scroll_offset : self.scroll_offset + visible_height
         ]
 
         for offset, match in enumerate(visible_matches):
             i = self.scroll_offset + offset
             if i == self.selected:
-                lines.append([
-                    ('class:selected', self.theme.pointer),
-                    ('', ' '),
-                    ('class:selected', match),
-                ])
+                lines.append(
+                    [
+                        ("class:selected", self.theme.pointer),
+                        ("", " "),
+                        ("class:selected", match),
+                    ]
+                )
             else:
-                lines.append([
-                    ('', '  '),
-                    ('', match),
-                ])
+                lines.append(
+                    [
+                        ("", "  "),
+                        ("", match),
+                    ]
+                )
 
         def get_line(i: int):
             if i < len(lines):
@@ -147,13 +157,13 @@ class _SearchControl(UIControl):
     def get_key_bindings(self) -> KeyBindings:
         kb = KeyBindings()
 
-        @kb.add('c-c')
-        @kb.add('escape')
+        @kb.add("c-c")
+        @kb.add("escape")
         def _(event):
             # Cancel search
             event.app.exit(result=None)
 
-        @kb.add('enter')
+        @kb.add("enter")
         def _(event):
             # Accept current selection if any
             if self.matches:
@@ -161,25 +171,25 @@ class _SearchControl(UIControl):
             else:
                 event.app.exit(result=None)
 
-        @kb.add('up')
+        @kb.add("up")
         def _(event):
             if self.matches:
                 self.selected = (self.selected - 1) % len(self.matches)
                 event.app.invalidate()
 
-        @kb.add('down')
+        @kb.add("down")
         def _(event):
             if self.matches:
                 self.selected = (self.selected + 1) % len(self.matches)
                 event.app.invalidate()
 
-        @kb.add('backspace')
+        @kb.add("backspace")
         def _(event):
             if self.query:
                 self.query = self.query[:-1]
                 self._update_matches(event)
 
-        @kb.add('<any>')
+        @kb.add("<any>")
         def _(event):
             # Printable characters append to query
             if event.data and event.data.isprintable():

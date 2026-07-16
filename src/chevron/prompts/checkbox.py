@@ -20,7 +20,9 @@ class Checkbox(ListPrompt):
             prefix = f"{self.theme.pointer} " if current else "  "
             lines.append((style, f"{prefix}{checked} {choice.title}\n"))
 
-        lines.append((self.theme.footer_style, "\n↑↓ Navigate • Space Toggle • Enter Confirm"))
+        lines.append(
+            (self.theme.footer_style, "\n↑↓ Navigate • Space Toggle • Enter Confirm")
+        )
         return lines
 
     def ask(self) -> list[str]:

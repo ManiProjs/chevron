@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 from prompt_toolkit.application import Application
@@ -55,9 +53,7 @@ class ListPrompt(BasePrompt):
         return [(style, f"{prefix}{choice}\n")]
 
     def render_footer(self):
-        return [
-            (self.theme.footer_style, "\n↑↓ Navigate • Enter Confirm")
-        ]
+        return [(self.theme.footer_style, "\n↑↓ Navigate • Enter Confirm")]
 
     def render(self):
         lines = []

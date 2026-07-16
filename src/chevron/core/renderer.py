@@ -17,21 +17,25 @@ class Renderer:
             lines = lines[1:]
 
         if len(lines) > 1:
-            return FormattedText([
-                (self.theme.error_style, lines[0]),
-                ("", "\n"),
+            return FormattedText(
+                [
+                    (self.theme.error_style, lines[0]),
+                    ("", "\n"),
+                    (self.theme.pointer_style, self.theme.pointer),
+                    ("", " "),
+                    (self.theme.message_style, "\n".join(lines[1:])),
+                    ("", "\n> "),
+                ]
+            )
+
+        return FormattedText(
+            [
                 (self.theme.pointer_style, self.theme.pointer),
                 ("", " "),
-                (self.theme.message_style, "\n".join(lines[1:])),
+                (self.theme.message_style, message),
                 ("", "\n> "),
-            ])
-
-        return FormattedText([
-            (self.theme.pointer_style, self.theme.pointer),
-            ("", " "),
-            (self.theme.message_style, message),
-            ("", "\n> "),
-        ])
+            ]
+        )
 
     def search(self, message: str, query: str, choices: list[str]):
         parts = [
@@ -62,14 +66,18 @@ class Renderer:
 
     def success(self, message: str):
         print_formatted_text(
-            FormattedText([
-                (self.theme.success_style, "✔ "),
-                (self.theme.success_style, message),
-            ])
+            FormattedText(
+                [
+                    (self.theme.success_style, "✔ "),
+                    (self.theme.success_style, message),
+                ]
+            )
         )
 
     def error(self, message: str):
-        return FormattedText([
-            (self.theme.error_style, "✖ "),
-            (self.theme.error_style, message),
-        ])
+        return FormattedText(
+            [
+                (self.theme.error_style, "✖ "),
+                (self.theme.error_style, message),
+            ]
+        )

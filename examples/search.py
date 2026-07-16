@@ -1,5 +1,3 @@
-
-
 from chevron import Search
 
 

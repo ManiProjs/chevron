@@ -22,16 +22,14 @@ class Confirm(BasePrompt):
         suffix = "Y/n" if self.default else "y/N"
 
         while True:
-            prompt = FormattedText([
-                *self.renderer.prompt(self.message),
-                ("", f" ({suffix}) "),
-            ])
-
-            value = (
-                self.terminal.input(prompt)
-                .strip()
-                .lower()
+            prompt = FormattedText(
+                [
+                    *self.renderer.prompt(self.message),
+                    ("", f" ({suffix}) "),
+                ]
             )
+
+            value = self.terminal.input(prompt).strip().lower()
 
             if value == "":
                 return self.default

@@ -30,5 +30,5 @@ __all__ = [
     "Input",
     "Choice",
     "Editor",
-    "Search"
+    "Search",
 ]
