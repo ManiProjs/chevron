@@ -1,0 +1,44 @@
+[project]
+name = "chevron"
+version = "1.0.0"
+description = "Beautiful interactive terminal prompts for Python."
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Mani Arasteh" }
+]
+
+license = { file = "LICENSE" }
+
+keywords = [
+    "cli",
+    "terminal",
+    "prompt",
+    "prompt-toolkit",
+    "tui",
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "prompt-toolkit>=3.0.52",
+]
+
+[project.urls]
+Homepage = "https://github.com/ManiProjs/chevron"
+Repository = "https://github.com/ManiProjs/chevron"
+Issues = "https://github.com/ManiProjs/chevron/issues"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+]
