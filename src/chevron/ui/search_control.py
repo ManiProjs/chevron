@@ -1,33 +1,30 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Sequence, Optional, Callable
+from typing import Sequence, Optional, Any
 
-from prompt_toolkit.application import Application
 from prompt_toolkit.formatted_text import FormattedText
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.layout import Layout
 from prompt_toolkit.layout.containers import HSplit, Window
 from prompt_toolkit.layout.controls import FormattedTextControl
-from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import TextArea
 
+from chevron.ui.control import PromptControl
 
-@dataclass
+
+@dataclass(slots=True)
 class SearchItem:
     value: Any
     label: str
-    description: str | None = None
+    description: Optional[str] = None
 
 
-class SearchControl:
+class SearchControl(PromptControl):
     def __init__(
         self,
         message: str,
         choices: Sequence[str | SearchItem],
         theme,
-        *,
-        display: Optional[Callable[[Any], str]] = None,
     ) -> None:
         self.message = message
         self.theme = theme
@@ -42,105 +39,10 @@ class SearchControl:
             for item in choices
         ]
 
-        self.display = display
-        self.result: Any = None
-
-    def run(self) -> Any:
-        control = _SearchPrompt(
-            choices=self.choices,
-            theme=self.theme,
-            display=self.display,
-        )
-
-        style = Style.from_dict(
-            {
-                "message": self.theme.message_style,
-                "pointer": self.theme.pointer_style,
-                "selected": self.theme.pointer_style,
-                "description": "ansibrightblack",
-                "query": "",
-            }
-        )
-
-        kb = KeyBindings()
-
-        @kb.add("c-c")
-        @kb.add("escape")
-        def cancel(event):
-            event.app.exit(result=None)
-
-        @kb.add("up")
-        def up(event):
-            control.move_selection(-1)
-            event.app.invalidate()
-
-        @kb.add("down")
-        def down(event):
-            control.move_selection(1)
-            event.app.invalidate()
-
-        @kb.add("enter")
-        def accept(event):
-            event.app.exit(
-                result=control.current_selection()
-            )
-
-        layout = Layout(
-            HSplit(
-                [
-                    Window(
-                        content=FormattedTextControl(
-                            FormattedText(
-                                [
-                                    (
-                                        "class:message",
-                                        f"{self.theme.pointer} {self.message}",
-                                    )
-                                ]
-                            )
-                        ),
-                        height=1,
-                    ),
-                    control.input,
-                    Window(
-                        content=control.results_control,
-                    ),
-                ]
-            )
-        )
-
-        app = Application(
-            layout=layout,
-            key_bindings=kb,
-            style=style,
-            mouse_support=False,
-            full_screen=False,
-        )
-
-        try:
-            self.result = app.run()
-        except KeyboardInterrupt:
-            self.result = None
-
-        return self.result
-
-
-class _SearchPrompt:
-    def __init__(
-        self,
-        choices: list[SearchItem],
-        theme,
-        display: Optional[Callable[[Any], str]],
-    ):
-        self.choices = choices
-        self.theme = theme
-        self.display = display
-
-        self.matches = choices.copy()
+        self.matches = self.choices.copy()
 
         self.selected = 0
         self.scroll_offset = 0
-
         self.visible_items = 6
 
         self.input = TextArea(
@@ -149,22 +51,43 @@ class _SearchPrompt:
             prompt="> ",
             height=1,
             style="class:query",
-            focusable=True,
         )
 
-        self.input.buffer.on_text_changed += (
-            self._on_query_changed
+        self.input.buffer.on_text_changed += self._on_query_changed
+
+        self.results_control = FormattedTextControl(self._render_results)
+
+        self._window = HSplit(
+            [
+                Window(
+                    content=FormattedTextControl(
+                        FormattedText(
+                            [
+                                (
+                                    "class:message",
+                                    f"{self.theme.pointer} {self.message}",
+                                )
+                            ]
+                        )
+                    ),
+                    height=1,
+                ),
+                self.input,
+                Window(
+                    content=self.results_control,
+                ),
+            ]
         )
 
-        self.results_control = FormattedTextControl(
-            self._get_results
-        )
+        self._key_bindings = self._create_key_bindings()
 
-    def _label(self, item: SearchItem) -> str:
-        if self.display:
-            return self.display(item.value)
+    @property
+    def window(self):
+        return self._window
 
-        return item.label
+    @property
+    def key_bindings(self):
+        return self._key_bindings
 
     def _fuzzy_match(
         self,
@@ -177,15 +100,15 @@ class _SearchPrompt:
         query = query.lower()
         text = text.lower()
 
-        index = 0
+        position = 0
 
         for char in query:
-            index = text.find(char, index)
+            position = text.find(char, position)
 
-            if index == -1:
+            if position == -1:
                 return False
 
-            index += 1
+            position += 1
 
         return True
 
@@ -197,20 +120,18 @@ class _SearchPrompt:
             for item in self.choices
             if self._fuzzy_match(
                 query,
-                self._label(item),
+                item.label,
             )
         ]
 
         self.selected = 0
         self.scroll_offset = 0
 
-    def move_selection(self, amount: int):
+    def _move_selection(self, amount: int):
         if not self.matches:
             return
 
-        self.selected = (
-            self.selected + amount
-        ) % len(self.matches)
+        self.selected = (self.selected + amount) % len(self.matches)
 
         self._ensure_visible()
 
@@ -218,15 +139,8 @@ class _SearchPrompt:
         if self.selected < self.scroll_offset:
             self.scroll_offset = self.selected
 
-        elif (
-            self.selected
-            >= self.scroll_offset + self.visible_items
-        ):
-            self.scroll_offset = (
-                self.selected
-                - self.visible_items
-                + 1
-            )
+        elif self.selected >= self.scroll_offset + self.visible_items:
+            self.scroll_offset = self.selected - self.visible_items + 1
 
     def current_selection(self):
         if not self.matches:
@@ -234,23 +148,22 @@ class _SearchPrompt:
 
         return self.matches[self.selected].value
 
-    def _get_results(self):
+    def _render_results(self):
         if not self.matches:
             return [
                 (
-                    "class:description",
+                    "class:error",
                     "  No results",
                 )
             ]
 
         self._ensure_visible()
 
-        visible = self.matches[
-            self.scroll_offset:
-            self.scroll_offset + self.visible_items
-        ]
-
         lines = []
+
+        visible = self.matches[
+            self.scroll_offset : self.scroll_offset + self.visible_items
+        ]
 
         for index, item in enumerate(
             visible,
@@ -258,22 +171,14 @@ class _SearchPrompt:
         ):
             selected = index == self.selected
 
-            prefix = (
-                self.theme.pointer
-                if selected
-                else " "
-            )
+            prefix = self.theme.pointer if selected else " "
 
-            style = (
-                "class:selected"
-                if selected
-                else ""
-            )
+            style = "class:selected" if selected else ""
 
             lines.append(
                 (
                     style,
-                    f"{prefix} {self._label(item)}\n",
+                    f"{prefix} {item.label}\n",
                 )
             )
 
@@ -285,11 +190,36 @@ class _SearchPrompt:
                     )
                 )
 
-        lines.append(
-            (
-                "class:description",
-                f"\n  {self.selected + 1}/{len(self.matches)}",
+        if len(self.matches) > self.visible_items:
+            lines.append(
+                (
+                    "class:description",
+                    f"\n  {self.selected + 1}/{len(self.matches)}",
+                )
             )
-        )
 
         return lines
+
+    def _create_key_bindings(self):
+        kb = KeyBindings()
+
+        @kb.add("up")
+        def _(event):
+            self._move_selection(-1)
+            event.app.invalidate()
+
+        @kb.add("down")
+        def _(event):
+            self._move_selection(1)
+            event.app.invalidate()
+
+        @kb.add("enter")
+        def _(event):
+            event.app.exit(result=self.current_selection())
+
+        @kb.add("escape")
+        @kb.add("c-c")
+        def _(event):
+            event.app.exit(result=None)
+
+        return kb

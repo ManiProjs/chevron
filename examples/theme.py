@@ -1,34 +1,23 @@
-from __future__ import annotations
-
-from dataclasses import dataclass
+from chevron import Select, Theme
 
 
-@dataclass(slots=True)
-class Theme:
-    """Visual theme used by Chevron prompts."""
+theme = Theme(
+    pointer="➜",
+    pointer_style="bold fg:#A78BFA",
+    selected_style="bold fg:#A78BFA",
+    footer_style="fg:#888888",
+)
 
-    # Symbols
-    pointer: str = "❯"
-    success_icon: str = "✔"
-    error_icon: str = "✖"
-    warning_icon: str = "⚠"
-    info_icon: str = "ℹ"
 
-    # Colors
-    accent: str = "#60A5FA"
-    success: str = "#22C55E"
-    error: str = "#EF4444"
-    warning: str = "#F59E0B"
-    info: str = "#06B6D4"
+result = Select(
+    "Choose a language",
+    [
+        "Python",
+        "Rust",
+        "Go",
+    ],
+    theme=theme,
+).ask()
 
-    # Styles (prompt_toolkit style strings)
-    pointer_style: str = "bold fg:#60A5FA"
-    message_style: str = ""
-    selected_style: str = "bold fg:#60A5FA"
-    success_style: str = "bold fg:#22C55E"
-    error_style: str = "bold fg:#EF4444"
-    warning_style: str = "bold fg:#F59E0B"
-    info_style: str = "bold fg:#06B6D4"
 
-    # Borders
-    border: str = "rounded"
+print(f"Selected: {result}")
