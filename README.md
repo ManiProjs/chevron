@@ -1,7 +1,7 @@
 # Chevron
 
-[![PyPI](https://img.shields.io/pypi/v/chevron.svg)](https://pypi.org/project/chevron/)
-[![Python](https://img.shields.io/pypi/pyversions/chevron.svg)](https://pypi.org/project/chevron/)
+[![PyPI](https://img.shields.io/pypi/v/chevron-sh.svg)](https://pypi.org/project/chevron/)
+[![Python](https://img.shields.io/pypi/pyversions/chevron-sh.svg)](https://pypi.org/project/chevron/)
 [![License](https://img.shields.io/github/license/ManiProjs/chevron)](LICENSE)
 [![CI](https://github.com/ManiProjs/chevron/actions/workflows/ci.yml/badge.svg)](https://github.com/ManiProjs/chevron/actions/workflows/ci.yml)
 

@@ -1,5 +1,5 @@
 [project]
-name = "chevron"
+name = "chevron-sh"
 version = "1.0.0"
 description = "Beautiful interactive terminal prompts for Python."
 readme = "README.md"
