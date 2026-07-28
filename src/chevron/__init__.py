@@ -13,6 +13,7 @@ from .prompts.number import Number
 from .prompts.choice import Choice
 from .prompts.editor import Editor
 from .prompts.search import Search
+from .prompts.spinner import Spinner
 
 from .theme.theme import Theme
 
@@ -31,4 +32,5 @@ __all__ = [
     "Choice",
     "Editor",
     "Search",
+    "Spinner",
 ]
