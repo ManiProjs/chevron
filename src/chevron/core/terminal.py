@@ -1,6 +1,11 @@
 from prompt_toolkit import prompt
 from prompt_toolkit.formatted_text import AnyFormattedText
+
+from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.layout import Layout
+from prompt_toolkit.layout.controls import DummyControl
+from prompt_toolkit.layout.containers import Window
 
 
 class Terminal:
@@ -17,7 +22,7 @@ class Terminal:
             is_password=password,
         )
 
-    def key(self) -> str:
+    def read_key(self) -> str:
         result = []
 
         bindings = KeyBindings()
@@ -27,10 +32,16 @@ class Terminal:
             result.append(event.key_sequence[0].key)
             event.app.exit()
 
-        prompt(
-            "",
+        app = Application(
+            layout=Layout(Window(DummyControl())),
             key_bindings=bindings,
+            full_screen=False,
         )
+
+        app.run()
+
+        if not result:
+            return ""
 
         return result[0]
 

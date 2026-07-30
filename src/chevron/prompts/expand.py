@@ -1,19 +1,23 @@
 from __future__ import annotations
 
-from prompt_toolkit.shortcuts import print_formatted_text
+from prompt_toolkit.application import Application
+from prompt_toolkit.formatted_text import FormattedText
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.layout import Layout
+from prompt_toolkit.layout.controls import FormattedTextControl
+from prompt_toolkit.layout.containers import Window
 
 from .base import BasePrompt
 
 
 class Expand(BasePrompt):
-    """Single-key selection prompt."""
+    """Inquirer-style expand prompt."""
 
     def __init__(
         self,
         message: str,
         choices: dict[str, str],
         *,
-        default: str | None = None,
         theme=None,
     ) -> None:
         super().__init__(
@@ -25,36 +29,78 @@ class Expand(BasePrompt):
             raise ValueError("choices cannot be empty")
 
         self.choices = choices
-        self.default = default
+        self.key = ""
+        self.selected = None
 
-        if default and default not in choices:
-            raise ValueError("default must be one of the choice keys")
+    def render(self):
+        keys = "".join(self.choices.keys())
 
-    def ask(self) -> str:
-        print_formatted_text(
-            self.renderer.expand(
-                self.message,
-                self.choices,
-                self.default,
+        parts = [
+            (
+                self.theme.pointer_style,
+                f"{self.theme.pointer} ",
+            ),
+            (
+                self.theme.message_style,
+                f"{self.message}: ({keys}) ",
+            ),
+            (
+                self.theme.pointer_style,
+                self.key,
+            ),
+        ]
+
+        if self.selected:
+            parts.append(
+                (
+                    self.theme.muted_style,
+                    f"\n{self.key}: {self.selected}",
+                )
             )
+
+        return FormattedText(parts)
+
+    def ask(self):
+        control = FormattedTextControl(
+            self.render,
+            focusable=True,
         )
 
-        while True:
-            key = self.terminal.key()
+        window = Window(
+            content=control,
+        )
 
-            if key == "\x03":
-                raise KeyboardInterrupt
+        bindings = KeyBindings()
 
-            if key in self.choices:
-                answer = self.choices[key]
+        @bindings.add("enter")
+        def _(event):
+            if self.selected:
+                event.app.exit(result=self.selected)
 
-                print_formatted_text(self.renderer.success(answer))
+        @bindings.add("c-c")
+        def _(event):
+            event.app.exit(result=None)
 
-                return answer
+        @bindings.add("<any>")
+        def _(event):
+            key = event.key_sequence[0].key
 
-            if key == "\r" and self.default:
-                answer = self.choices[self.default]
+            if len(key) != 1:
+                return
 
-                print_formatted_text(self.renderer.success(answer))
+            if key not in self.choices:
+                return
 
-                return answer
+            self.key = key
+            self.selected = self.choices[key]
+
+            event.app.invalidate()
+
+        app = Application(
+            layout=Layout(window),
+            key_bindings=bindings,
+            style=self.theme.style(),
+            full_screen=False,
+        )
+
+        return app.run()

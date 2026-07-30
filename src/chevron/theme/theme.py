@@ -32,12 +32,12 @@ class Theme:
     warning_style: str = "bold fg:#F59E0B"
     info_style: str = "bold fg:#06B6D4"
     footer_style: str = "fg:#6B7280"
+    muted_style: str = "fg:#6B7280"
 
     # Borders
-
     border: str = "rounded"
 
-    def style(self) -> Style:
+    def style(self):
         return Style.from_dict(
             {
                 "message": self.message_style,
@@ -47,5 +47,7 @@ class Theme:
                 "error": self.error_style,
                 "warning": self.warning_style,
                 "info": self.info_style,
+                "footer": self.footer_style,
+                "muted": self.muted_style,
             }
         )
