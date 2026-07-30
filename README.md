@@ -7,7 +7,7 @@
 
 > Beautiful, modern interactive terminal prompts for Python.
 
-Chevron is a modern prompt library for Python built on top of `prompt_toolkit`. It helps you build beautiful interactive command-line applications with a clean, intuitive API, rich terminal controls, and customizable themes.
+Chevron is a modern prompt library built on top of `prompt_toolkit`. It provides a clean API for creating beautiful CLI experiences with customizable themes, interactive controls, and reusable terminal components.
 
 ## Features
 
@@ -16,12 +16,14 @@ Chevron is a modern prompt library for Python built on top of `prompt_toolkit`. 
 - 📝 Text input
 - 🔒 Password input
 - ✅ Confirmation prompts
+- 🔢 Number prompts
+- 🎯 Select menus
 - ☑️ Checkbox prompts
-- 🔍 Interactive search prompt
-- 📝 Built-in text editor
-- 🎯 Consistent keyboard navigation
-- 🌈 Theme support
-- 🚀 Fast and lightweight
+- 🔍 Interactive search
+- ✏️ Editor prompts
+- 🔀 Expand prompts
+- ⏳ Spinner controls
+- 🌈 Theme customization
 
 ## Installation
 
@@ -29,7 +31,7 @@ Chevron is a modern prompt library for Python built on top of `prompt_toolkit`. 
 pip install chevron
 ```
 
-Or with uv:
+or:
 
 ```bash
 uv add chevron
@@ -48,45 +50,44 @@ language = Select(
         "Python",
         "Rust",
         "Go",
-        "Zig",
     ],
 ).ask()
 
 remember = Confirm(
     "Remember your choice?"
 ).ask()
-
-print(name)
-print(language)
-print(remember)
 ```
 
-## Available Prompts
+## Prompts
 
 ### Input
 
 ```python
-name = Input("Name").ask()
+Input("Name").ask()
 ```
 
 ### Password
 
 ```python
-password = Password("Password").ask()
+Password("Password").ask()
 ```
 
 ### Confirm
 
 ```python
-delete = Confirm(
-    "Delete project?"
-).ask()
+Confirm("Delete project?").ask()
+```
+
+### Number
+
+```python
+Number("Age").ask()
 ```
 
 ### Select
 
 ```python
-language = Select(
+Select(
     "Language",
     [
         "Python",
@@ -99,7 +100,7 @@ language = Select(
 ### Checkbox
 
 ```python
-languages = Checkbox(
+Checkbox(
     "Languages",
     [
         "Python",
@@ -112,29 +113,53 @@ languages = Checkbox(
 ### Search
 
 ```python
-package = Search(
+Search(
     "Search package",
     [
         "numpy",
         "pandas",
-        "matplotlib",
         "torch",
     ],
 ).ask()
 ```
 
+### Expand
+
+Inquirer-style single-key selection:
+
+```python
+Expand(
+    "Choose an action",
+    {
+        "n": "Create a new file",
+        "o": "Open a file",
+        "d": "Delete a file",
+        "q": "Quit",
+    },
+).ask()
+```
+
+Example:
+
+```text
+❯ Choose an action: (nodq) o
+o: Open a file
+```
+
 ### Editor
 
 ```python
-text = Editor(
+Editor(
     "Commit message"
 ).ask()
 ```
 
 ## Themes
 
+Chevron supports customizable themes:
+
 ```python
-from chevron import Theme
+from chevron import Theme, Input
 
 theme = Theme(
     pointer="▶",
@@ -146,28 +171,47 @@ Input(
 ).ask()
 ```
 
-## Examples
+Themes control:
 
-Run the examples:
+- icons
+- colors
+- prompt styles
+- selected states
+- messages
+
+## Examples
 
 ```bash
 python examples/input.py
 python examples/select.py
+python examples/checkbox.py
+python examples/search.py
+python examples/expand.py
 python examples/all.py
 ```
 
 ## Roadmap
 
-- [x] Input
-- [x] Password
-- [x] Confirm
-- [x] Number
-- [x] Select improvements
-- [x] Checkbox improvements
+### Completed
+
+- [x] Input prompt
+- [x] Password prompt
+- [x] Confirm prompt
+- [x] Number prompt
+- [x] Select prompt
+- [x] Checkbox prompt
 - [x] Search prompt
+- [x] Editor prompt
+- [x] Expand prompt
+- [x] Theme system
+
+### Planned
+
 - [ ] Unit tests
 - [ ] Async API
 - [ ] Plugin system
+- [ ] Custom prompt API
+- [ ] More terminal controls
 
 ## Contributing
 
