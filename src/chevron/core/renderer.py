@@ -81,3 +81,40 @@ class Renderer:
                 (self.theme.error_style, message),
             ]
         )
+
+    def expand(
+        self,
+        message: str,
+        choices: dict[str, str],
+        default: str | None = None,
+    ):
+        parts = [
+            (self.theme.pointer_style, self.theme.pointer),
+            ("", " "),
+            (self.theme.message_style, message),
+            ("", "\n\n"),
+        ]
+
+        for key, value in choices.items():
+            if key == default:
+                prefix = "› "
+            else:
+                prefix = "  "
+
+            parts.append(
+                (
+                    self.theme.pointer_style,
+                    f"{prefix}{key}",
+                )
+            )
+
+            parts.append(
+                (
+                    self.theme.message_style,
+                    f"  {value}",
+                )
+            )
+
+            parts.append(("", "\n"))
+
+        return FormattedText(parts)

@@ -14,6 +14,9 @@ from .prompts.choice import Choice
 from .prompts.editor import Editor
 from .prompts.search import Search
 from .prompts.spinner import Spinner
+from .prompts.expand import Expand
+
+from .widgets.progress import Progress
 
 from .theme.theme import Theme
 
@@ -33,4 +36,6 @@ __all__ = [
     "Editor",
     "Search",
     "Spinner",
+    "Progress",
+    "Expand",
 ]

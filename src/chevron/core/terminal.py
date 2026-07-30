@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 from prompt_toolkit import prompt
 from prompt_toolkit.formatted_text import AnyFormattedText
+from prompt_toolkit.key_binding import KeyBindings
 
 
 class Terminal:
@@ -17,6 +16,23 @@ class Terminal:
             prompt_text,
             is_password=password,
         )
+
+    def key(self) -> str:
+        result = []
+
+        bindings = KeyBindings()
+
+        @bindings.add("<any>")
+        def _(event):
+            result.append(event.key_sequence[0].key)
+            event.app.exit()
+
+        prompt(
+            "",
+            key_bindings=bindings,
+        )
+
+        return result[0]
 
     def clear(self) -> None:
         print("\033[2J\033[H", end="")

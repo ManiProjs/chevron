@@ -5,11 +5,13 @@ from chevron.theme.theme import Theme
 
 # --- Fixtures for Setup ---
 
+
 @pytest.fixture
 def mock_terminal():
     """Fixture to mock the terminal input/output."""
     mock = MagicMock()
     return mock
+
 
 @pytest.fixture
 def mock_renderer():
@@ -19,12 +21,15 @@ def mock_renderer():
     mock.prompt.return_value = "Prompt text here"
     return mock
 
+
 @pytest.fixture
 def theme_default():
     """A default theme object for testing."""
     return Theme(accent="#60A5FA", error="#EF4444")
 
+
 # --- Test Cases for Confirm Prompt Logic ---
+
 
 def test_confirm_default_yes(mock_terminal, mock_renderer):
     """Test confirmation defaults to True when the user enters nothing (empty input)."""
@@ -36,6 +41,7 @@ def test_confirm_default_yes(mock_terminal, mock_renderer):
 
     assert result is True
 
+
 def test_confirm_default_no(mock_terminal, mock_renderer):
     """Test confirmation defaults to False when the user enters nothing (empty input)."""
     # Mock terminal.input to return an empty string
@@ -46,6 +52,7 @@ def test_confirm_default_no(mock_terminal, mock_renderer):
 
     assert result is False
 
+
 def test_confirm_yes(mock_terminal, mock_renderer):
     """Test confirmation returns True when user inputs 'y' or 'yes'."""
     mock_terminal.input.return_value = "Yes"
@@ -55,6 +62,7 @@ def test_confirm_yes(mock_terminal, mock_renderer):
 
     assert result is True
 
+
 def test_confirm_no(mock_terminal, mock_renderer):
     """Test confirmation returns False when user inputs 'n' or 'no'."""
     mock_terminal.input.return_value = "No"
@@ -63,6 +71,7 @@ def test_confirm_no(mock_terminal, mock_renderer):
     result = prompt.ask()
 
     assert result is False
+
 
 def test_confirm_with_theme_style(mock_terminal, mock_renderer, theme_default):
     """Test that the prompt correctly applies style based on the theme."""
